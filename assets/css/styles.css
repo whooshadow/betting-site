@@ -1,0 +1,131 @@
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: linear-gradient(135deg, #1a2b3c, #2c5364, #2c4c3b);
+  min-height: 100vh;
+  color: #333;
+}
+
+h1 {
+  color: white;
+  text-align: center;
+  font-size: 2.5em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin-bottom: 30px;
+}
+
+#content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: rgba(241, 245, 249, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+#sports-nav {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.sport-tab {
+  display: inline-block;
+  padding: 12px 25px;
+  margin: 5px;
+  background: #34775c73;
+  color: white;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-size: 0.9em;
+  letter-spacing: 1px;
+}
+
+.sport-tab:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.sport-tab.active {
+  background: #448362f1;
+  box-shadow: 0 4px 10px rgba(30, 58, 49, 0.3);
+}
+
+.match-card {
+  background: #f1f5f9;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.1s ease;
+  border-left: 5px solid #34775c;
+}
+
+.match-card:hover {
+  transform: translateY(-1px);
+}
+
+.match-header {
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #2c3e50;
+  font-size: 1.1em;
+}
+
+.match-header .teams {
+  font-weight: 600;
+  color: #1e3a31;
+  font-size: 1.1em;
+  margin-bottom: 5px;
+}
+
+.match-header .match-time {
+  color: #34775cc7;
+  font-size: 0.9em;
+}
+
+.odds-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.odds-button {
+  flex: 1;
+  padding: 12px;
+  background: rgba(52, 119, 92, 0.1);
+  border: 1px solid #34775c;
+  border-radius: 8px;
+  cursor: default;
+  transition: all 0.3s ease;
+  color: #1e3a31;
+  font-weight: 600;
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+}
+
+.odds-button:hover {
+  background: rgba(52, 119, 92, 0.1);
+  color: #1e3a31;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  .odds-container {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 8px;
+  }
+
+  .odds-button {
+    padding: 10px;
+  }
+}
