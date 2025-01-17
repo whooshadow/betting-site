@@ -1,0 +1,12 @@
+{
+  "name": "purebets",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "fetch-data": "node fetch.js",
+    "start": "live-server"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

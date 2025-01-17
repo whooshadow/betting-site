@@ -1,100 +1,131 @@
-import { CONFIG } from "../../../config.js"; // Changed this line to point to root config
+import { CONFIG } from "../../../config.js";
 import { MOCK_DATA } from "./mockData.js";
 
-/**
- * API Service Layer
- * Handles all communication with the betting API or mock data
- */
 export class BettingAPI {
-  /**
-   * Fetches available sports from the API or mock data
-   * Falls back to mock data if API fails or mock mode is enabled
-   */
   static async fetchSports() {
-    if (CONFIG.USE_MOCK_DATA) {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return MOCK_DATA.sports;
-    }
-
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(
-        () => controller.abort(),
-        CONFIG.API_TIMEOUT
+      if (CONFIG.OFFLINE_MODE) {
+        console.log("Fetching sports from file...");
+        const data = await this.#fetchFromFile();
+        console.log("Raw sports data:", data.sports);
+        const transformed = this.transformSportsData(data.sports);
+        console.log("Transformed sports data:", transformed);
+        return transformed;
+      }
+
+      const response = await fetch(
+        `${CONFIG.API_BASE_URL}/sports?apiKey=${CONFIG.API_KEY}`
       );
-
-      const response = await fetch(`${CONFIG.API_BASE_URL}/sports`, {
-        headers: { Authorization: `Bearer ${CONFIG.API_KEY}` },
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-
       if (!response.ok) throw new Error("API request failed");
       return await response.json();
     } catch (error) {
-      console.warn("Failed to fetch from API, using mock data:", error);
-      return MOCK_DATA.sports;
+      console.error("Sports fetch error:", error);
+      throw error;
     }
   }
 
-  /**
-   * Fetches matches for a specific sport
-   * @param {number} sportId - The ID of the sport to fetch matches for
-   * @returns {Array} Array of matches with normalized structure
-   */
-  static async fetchMatchesBySport(sportId) {
-    if (CONFIG.USE_MOCK_DATA) {
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      const sportData = MOCK_DATA.sportEvents[sportId];
-      if (!sportData) return [];
-      return this.transformSportData(sportData);
-    }
-
+  static async fetchMatchesBySport(sportKey) {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(
-        () => controller.abort(),
-        CONFIG.API_TIMEOUT
-      );
+      if (CONFIG.OFFLINE_MODE) {
+        console.log(`Fetching matches for ${sportKey} from file...`);
+        const data = await this.#fetchFromFile();
+        const matches = data.matches[sportKey] || [];
+        return this.transformOddsResponse(matches);
+      }
 
-      const response = await fetch(
-        `${CONFIG.API_BASE_URL}/sports/${sportId}/matches`,
-        {
-          headers: { Authorization: `Bearer ${CONFIG.API_KEY}` },
-          signal: controller.signal,
-        }
-      );
-      clearTimeout(timeoutId);
+      const url = `${CONFIG.API_BASE_URL}/sports/${sportKey}/odds`;
+      const params = new URLSearchParams({
+        apiKey: CONFIG.API_KEY,
+        regions: CONFIG.DEFAULT_REGIONS,
+        markets: CONFIG.DEFAULT_MARKETS,
+      });
 
+      const response = await fetch(`${url}?${params}`);
       if (!response.ok) throw new Error("API request failed");
-      const data = await response.json();
-      return this.transformSportData(data);
+      return await response.json();
     } catch (error) {
-      console.warn(
-        `Failed to fetch matches for sport ${sportId}, using mock data:`,
-        error
-      );
-      const sportData = MOCK_DATA.sportEvents[sportId];
-      return sportData ? this.transformSportData(sportData) : [];
+      console.error("Matches fetch error:", error);
+      throw error;
     }
   }
 
-  /**
-   * Transforms API sport data into a consistent format
-   * @param {Object} sportData - Raw sport data from API
-   * @returns {Array} Normalized array of matches
-   */
-  static transformSportData(sportData) {
-    return sportData.league.flatMap((league) =>
-      league.events.map((event) => ({
-        id: event.id,
-        teams: [event.home, event.away],
-        startTime: event.starts,
-        leagueName: league.name,
-        status: event.status,
-        odds: event.odds,
-        rotNum: event.rotNum,
-      }))
-    );
+  static async #fetchFromFile() {
+    try {
+      console.log("Attempting to fetch from:", CONFIG.DATA_FILE_PATH);
+      const response = await fetch(CONFIG.DATA_FILE_PATH);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to load data file: ${response.status} ${response.statusText}`
+        );
+      }
+      const data = await response.json();
+      console.log("Successfully loaded data:", data);
+      return data;
+    } catch (error) {
+      console.error("Error loading offline data:", error);
+      throw error;
+    }
+  }
+
+  static transformSportsData(sports) {
+    if (!Array.isArray(sports)) {
+      console.error("Invalid sports data:", sports);
+      return {};
+    }
+
+    const grouped = sports.reduce((acc, sport) => {
+      if (!sport.key || !sport.title) {
+        console.warn("Invalid sport entry:", sport);
+        return acc;
+      }
+
+      const category = sport.group || this.getMainCategory(sport.key);
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+
+      acc[category].push({
+        sportId: sport.key,
+        name: sport.title,
+        key: sport.key,
+        category: category,
+      });
+      return acc;
+    }, {});
+
+    console.log("Transformed sports data:", grouped);
+    return grouped;
+  }
+
+  static getMainCategory(key) {
+    const map = {
+      soccer: "Soccer",
+      basketball: "Basketball",
+      baseball: "Baseball",
+      americanfootball: "American Football",
+      icehockey: "Ice Hockey",
+    };
+    const mainCategory = Object.keys(map).find((cat) => key.includes(cat));
+    return map[mainCategory] || "Other";
+  }
+
+  static transformOddsResponse(events) {
+    return events.map((event) => ({
+      id: event.id,
+      teams: [event.home_team, event.away_team],
+      startTime: event.commence_time,
+      odds: this.extractOdds(event.bookmakers),
+    }));
+  }
+
+  static extractOdds(bookmakers) {
+    if (!bookmakers?.length) return {};
+    const markets = bookmakers[0]?.markets?.[0];
+    if (!markets?.outcomes) return {};
+
+    return markets.outcomes.reduce((acc, outcome) => {
+      acc[outcome.name] = outcome.price;
+      return acc;
+    }, {});
   }
 }
