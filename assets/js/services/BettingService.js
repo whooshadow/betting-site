@@ -14,14 +14,26 @@ export class BettingService {
     this.currentSport = null;
     this.onDataUpdate = onDataUpdate;
     this.intervalId = null;
+    console.log("BettingService created");
   }
 
   /**
    * Initializes the service and starts data refresh cycle
    */
   async initialize() {
-    await this.loadSports();
-    this.startAutoRefresh();
+    try {
+      console.log("BettingService initializing...");
+      await this.loadSports();
+      this.startAutoRefresh();
+      console.log(
+        `Auto-refresh started. Will update every ${
+          CONFIG.REFRESH_INTERVAL / 1000
+        } seconds`
+      );
+    } catch (error) {
+      console.error("Initialization failed:", error);
+      throw error;
+    }
   }
 
   /**
@@ -29,30 +41,51 @@ export class BettingService {
    * Sets initial sport if none is selected
    */
   async loadSports() {
-    this.sports = await BettingAPI.fetchSports();
-    if (this.sports.length > 0 && !this.currentSport) {
-      this.currentSport = this.sports[0].sportId; // Use sportId instead of id
+    try {
+      console.log("Loading sports...");
+      const groupedSports = await BettingAPI.fetchSports();
+      console.log("Grouped sports loaded:", groupedSports);
+
+      // Get the first category's first sport as default
+      const firstCategory = Object.values(groupedSports)[0];
+      if (firstCategory?.length > 0 && !this.currentSport) {
+        this.currentSport = firstCategory[0].sportId;
+        console.log("Set initial sport:", this.currentSport);
+      }
+
+      this.sports = groupedSports; // Store the grouped sports
+      await this.loadCurrentSportMatches();
+    } catch (error) {
+      console.error("Failed to load sports:", error);
+      throw error;
     }
-    await this.loadCurrentSportMatches();
   }
 
   /**
    * Fetches and updates matches for the currently selected sport
    */
   async loadCurrentSportMatches() {
-    // Check if there is a current sport selected
-    if (!this.currentSport) return;
+    if (!this.currentSport) {
+      console.warn("No current sport selected");
+      return;
+    }
 
-    // Fetch matches for the current sport from the API
-    const matches = await BettingAPI.fetchMatchesBySport(this.currentSport);
+    try {
+      console.log("Loading matches for sport:", this.currentSport);
+      const matches = await BettingAPI.fetchMatchesBySport(this.currentSport);
 
-    // If there is a callback for data updates, call it with the updated data
-    if (this.onDataUpdate) {
-      this.onDataUpdate({
-        sports: this.sports,
-        currentSport: this.currentSport,
-        matches: matches,
-      });
+      if (this.onDataUpdate) {
+        const updateData = {
+          sports: this.sports,
+          currentSport: this.currentSport,
+          matches: matches,
+        };
+        console.log("Updating UI with data:", updateData);
+        this.onDataUpdate(updateData);
+      }
+    } catch (error) {
+      console.error("Failed to load matches:", error);
+      throw error;
     }
   }
 
@@ -61,8 +94,13 @@ export class BettingService {
    * Uses interval defined in CONFIG
    */
   startAutoRefresh() {
-    // Start an interval to refresh the matches data periodically
+    if (this.intervalId) {
+      console.log("Clearing existing refresh interval");
+      clearInterval(this.intervalId);
+    }
+
     this.intervalId = setInterval(() => {
+      console.log("Auto-refresh: Fetching new data...");
       this.loadCurrentSportMatches();
     }, CONFIG.REFRESH_INTERVAL);
   }
@@ -88,5 +126,13 @@ export class BettingService {
 
     // Load matches for the new current sport
     await this.loadCurrentSportMatches();
+  }
+
+  /**
+   * Cleanup method to stop auto-refresh
+   */
+  cleanup() {
+    console.log("BettingService cleanup");
+    this.stopAutoRefresh();
   }
 }
