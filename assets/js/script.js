@@ -176,20 +176,42 @@ class BettingUI {
 
   selectCategory(category, sports, leaguesContainer) {
     this.currentCategory = category;
+
     // Update category tabs
     document.querySelectorAll(".category-tab").forEach((tab) => {
       tab.classList.toggle("active", tab.textContent === category);
     });
+
+    // Find first available league/sport in the category
+    const firstSport = Array.isArray(sports)
+      ? sports[0] // Regular sports
+      : sports.find((s) => s.isCountryGroup)?.leagues?.[0] || sports[0]; // Football with country groups
+
+    if (firstSport) {
+      console.log("Auto-selecting first sport:", firstSport);
+      this.bettingService.changeSport(firstSport.sportId);
+    }
+
     // Update leagues display
-    this.renderLeagues(
-      sports,
-      this.bettingService.currentSport,
-      leaguesContainer
-    );
+    this.renderLeagues(sports, firstSport?.sportId, leaguesContainer);
   }
 
   renderLeagues(sports, currentSport, container) {
     container.innerHTML = "";
+
+    if (!Array.isArray(sports)) return;
+
+    // If no sport is currently selected, select the first one
+    if (!currentSport && sports.length > 0) {
+      const firstSport = sports[0].isCountryGroup
+        ? sports[0].leagues[0]
+        : sports[0];
+      currentSport = firstSport.sportId;
+      this.bettingService.changeSport(currentSport);
+    }
+
+    // Rest of the renderLeagues function...
+    // ...existing code...
     sports.forEach((sport) => {
       const leagueTab = document.createElement("div");
       leagueTab.className = `league-tab ${
