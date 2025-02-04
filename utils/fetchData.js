@@ -74,8 +74,21 @@ async function fetchAllData() {
 
 async function saveData(data) {
   const dataPath = path.join(process.cwd(), "data", "betting-data.json");
+  const backupPath = path.join(
+    process.cwd(),
+    "data",
+    `betting-data-${Date.now()}.json`
+  );
+
+  // Create backup of existing data
+  if (fs.existsSync(dataPath)) {
+    fs.copyFileSync(dataPath, backupPath);
+    console.log("Created backup of existing data");
+  }
+
   fs.mkdirSync(path.dirname(dataPath), { recursive: true });
   fs.writeFileSync(dataPath, JSON.stringify(data, null, 2));
+  console.log("Saved new data to file");
 }
 
 async function fetchSports() {
@@ -88,27 +101,66 @@ async function fetchSports() {
 
 async function fetchMatchesForSport(sportKey) {
   try {
-    const url = `${CONFIG.API_BASE_URL}/sports/${sportKey}/odds`;
-    const params = new URLSearchParams({
-      apiKey: CONFIG.API_KEY,
-      regions: CONFIG.DEFAULT_REGIONS,
-      markets: CONFIG.DEFAULT_MARKETS,
-    });
+    const regions = CONFIG.DEFAULT_REGIONS.split(",");
+    const markets = CONFIG.DEFAULT_MARKETS.split(",");
+    let allMatches = [];
 
-    const response = await fetch(`${url}?${params}`);
+    console.log(`Fetching ${sportKey} data for:`, { regions, markets });
 
-    if (!response.ok) {
-      if (response.status === 404) {
-        return null;
+    for (const region of regions) {
+      for (const market of markets) {
+        try {
+          const url = `${CONFIG.API_BASE_URL}/sports/${sportKey}/odds`;
+          const params = new URLSearchParams({
+            apiKey: CONFIG.API_KEY,
+            regions: region,
+            markets: market,
+          });
+
+          console.log(`Fetching ${region}/${market} for ${sportKey}...`);
+          const response = await fetch(`${url}?${params}`);
+
+          if (!response.ok) {
+            console.warn(
+              `Skipped ${region}/${market} for ${sportKey}: ${response.status}`
+            );
+            continue;
+          }
+
+          const data = await response.json();
+          if (data && data.length > 0) {
+            allMatches = [...allMatches, ...data];
+            console.log(
+              `✓ Found ${data.length} matches for ${sportKey} (${region}/${market})`
+            );
+          }
+
+          // Add delay between requests
+          await new Promise((resolve) =>
+            setTimeout(resolve, CONFIG.REQUEST_DELAY)
+          );
+        } catch (error) {
+          console.warn(
+            `Failed to fetch ${region}/${market} for ${sportKey}:`,
+            error.message
+          );
+          continue;
+        }
       }
-      throw new Error(
-        `API returned ${response.status}: ${response.statusText}`
-      );
     }
 
-    return await response.json();
+    // Remove duplicates based on event ID
+    const uniqueMatches = [
+      ...new Map(allMatches.map((match) => [match.id, match])).values(),
+    ];
+    console.log(
+      `Total unique matches for ${sportKey}: ${uniqueMatches.length}`
+    );
+
+    return uniqueMatches;
   } catch (error) {
-    throw new Error(`Failed to fetch matches: ${error.message}`);
+    console.error(`Failed to fetch matches for ${sportKey}:`, error);
+    return null;
   }
 }
 

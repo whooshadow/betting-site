@@ -110,20 +110,84 @@ export class BettingAPI {
   }
 
   static transformOddsResponse(events) {
+    if (!Array.isArray(events)) return [];
+
     return events.map((event) => ({
       id: event.id,
       teams: [event.home_team, event.away_team],
       startTime: event.commence_time,
-      odds: this.extractOdds(event.bookmakers),
+      bookmakers: event.bookmakers || [],
+      odds: this.extractOdds(event.bookmakers || []),
+      allMarkets: this.extractAllMarkets(event.bookmakers || []),
+      homeTeam: event.home_team,
+      awayTeam: event.away_team,
+      commenceTime: event.commence_time,
     }));
+  }
+
+  static extractAllMarkets(bookmakers) {
+    if (!bookmakers?.length) return [];
+
+    // Get all unique markets from all bookmakers
+    const allMarkets = bookmakers.reduce((markets, bookmaker) => {
+      bookmaker.markets?.forEach((market) => {
+        const existingMarket = markets.find((m) => m.key === market.key);
+        if (!existingMarket) {
+          markets.push({
+            key: market.key,
+            name: this.formatMarketName(market.key),
+            outcomes: market.outcomes.map((outcome) => ({
+              name: outcome.name,
+              price: outcome.price,
+              point: outcome.point,
+            })),
+          });
+        }
+      });
+      return markets;
+    }, []);
+
+    return allMarkets;
+  }
+
+  static formatMarketName(key) {
+    const marketNames = {
+      h2h: "Match Winner",
+      spreads: "Point Spread",
+      totals: "Total Points",
+      h2h_lay: "Exchange Odds",
+      alternate_spreads: "Alternative Spreads",
+      alternate_totals: "Alternative Totals",
+      btts: "Both Teams to Score",
+      draw_no_bet: "Draw No Bet",
+      double_chance: "Double Chance",
+      first_half_winner: "First Half Winner",
+      second_half_winner: "Second Half Winner",
+      first_half_spread: "First Half Spread",
+      first_half_totals: "First Half Totals",
+      team_totals: "Team Totals",
+      race_to: "Race To Points",
+      correct_score: "Correct Score",
+      winning_margin: "Winning Margin",
+      player_props: "Player Props",
+      team_props: "Team Props",
+      asian_handicap: "Asian Handicap",
+    };
+    return (
+      marketNames[key] ||
+      key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+    );
   }
 
   static extractOdds(bookmakers) {
     if (!bookmakers?.length) return {};
-    const markets = bookmakers[0]?.markets?.[0];
-    if (!markets?.outcomes) return {};
 
-    return markets.outcomes.reduce((acc, outcome) => {
+    // Find the h2h (1X2) market
+    const h2hMarket = bookmakers[0]?.markets?.find((m) => m.key === "h2h");
+    if (!h2hMarket?.outcomes) return {};
+
+    // Map team names to their odds
+    return h2hMarket.outcomes.reduce((acc, outcome) => {
       acc[outcome.name] = outcome.price;
       return acc;
     }, {});
