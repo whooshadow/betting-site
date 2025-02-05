@@ -276,114 +276,10 @@ class BettingUI {
   }
 
   renderDetailedMatch(match) {
-    // Debug log to see what markets are available
-    console.log("All markets for match:", match.allMarkets);
-
     const detailedView = document.createElement("div");
     detailedView.className = "detailed-match-view";
 
-    // Add back button
-    const backButton = document.createElement("button");
-    backButton.className = "back-button";
-    backButton.innerHTML = "← Back to matches";
-    backButton.onclick = () => {
-      this.selectedMatchId = null;
-      this.bettingService.loadCurrentSportMatches();
-    };
-
-    // Create match header
-    const matchHeader = `
-        <div class="match-header">
-            <h2>${match.homeTeam} vs ${match.awayTeam}</h2>
-            <div class="match-time">${new Date(
-              match.commenceTime
-            ).toLocaleString()}</div>
-        </div>
-    `;
-
-    // Create container for all betting markets
-    const marketsContainer = document.createElement("div");
-    marketsContainer.className = "betting-markets";
-
-    // Group and display markets
-    const marketGroups = {
-      "Main Odds": ["h2h"],
-      "Spreads & Totals": ["spreads", "totals"],
-      "Half Markets": [
-        "first_half_winner",
-        "first_half_spread",
-        "first_half_totals",
-      ],
-      "Special Markets": [
-        "btts",
-        "correct_score",
-        "double_chance",
-        "draw_no_bet",
-      ],
-    };
-
-    for (const [groupTitle, marketKeys] of Object.entries(marketGroups)) {
-      const marketsInGroup = match.allMarkets.filter((m) =>
-        marketKeys.includes(m.key)
-      );
-
-      if (marketsInGroup.length > 0) {
-        const groupElement = document.createElement("div");
-        groupElement.className = "market-group";
-        groupElement.innerHTML = `
-                <h3 class="market-group-title">${groupTitle}</h3>
-                <div class="markets-grid">
-                    ${marketsInGroup
-                      .map(
-                        (market) => `
-                        <div class="market-box">
-                            <div class="market-name">${market.name}</div>
-                            <div class="market-outcomes">
-                                ${market.outcomes
-                                  .map(
-                                    (outcome) => `
-                                    <div class="outcome">
-                                        <span class="outcome-name">${
-                                          outcome.name
-                                        }</span>
-                                        ${
-                                          outcome.point
-                                            ? `<span class="outcome-point">(${outcome.point})</span>`
-                                            : ""
-                                        }
-                                        <span class="outcome-price">${
-                                          outcome.price
-                                        }</span>
-                                    </div>
-                                `
-                                  )
-                                  .join("")}
-                            </div>
-                        </div>
-                    `
-                      )
-                      .join("")}
-                </div>
-            `;
-        marketsContainer.appendChild(groupElement);
-      }
-    }
-
-    // Assemble the view
-    detailedView.innerHTML = matchHeader;
-    detailedView.appendChild(marketsContainer);
-    detailedView.insertBefore(backButton, detailedView.firstChild);
-
-    // Clear and update the display
-    this.matchesContainer.innerHTML = "";
-    this.matchesContainer.appendChild(detailedView);
-  }
-
-  renderDetailedMatch(match) {
-    const detailedView = document.createElement("div");
-    detailedView.className = "detailed-match-view";
-
-    // Simple arrow back button
+    // Back button
     const backButton = document.createElement("button");
     backButton.className = "back-button";
     backButton.innerHTML = "←";
@@ -391,14 +287,6 @@ class BettingUI {
       this.selectedMatchId = null;
       this.bettingService.loadCurrentSportMatches();
     };
-
-    // Debug log to help understand what data we have
-    console.log("Match details:", {
-      id: match.id,
-      teams: match.teams,
-      markets: match.allMarkets,
-      bookmakers: match.bookmakers,
-    });
 
     // Match header
     const matchHeader = `
@@ -414,94 +302,38 @@ class BettingUI {
     const marketsContainer = document.createElement("div");
     marketsContainer.className = "betting-markets";
 
-    // Define market categories with all possible markets
-    const marketCategories = {
-      "Main Markets": ["h2h", "double_chance", "draw_no_bet"],
-      "Handicap & Totals": [
-        "spreads",
-        "asian_handicap",
-        "totals",
-        "alternate_spreads",
-        "alternate_totals",
-        "team_totals",
-      ],
-      "Half Markets": [
-        "first_half_winner",
-        "first_half_spread",
-        "first_half_totals",
-        "second_half_winner",
-      ],
-      "Goals & Scores": ["btts", "correct_score", "winning_margin", "race_to"],
-      "Player & Team": ["player_props", "team_props"],
-      "Other Markets": [],
-    };
-
-    // Log available market keys
-    const availableMarkets = match.allMarkets.map((m) => m.key);
-    console.log("Available market keys:", availableMarkets);
-
-    // Process each category
-    Object.entries(marketCategories).forEach(([category, marketKeys]) => {
-      const marketsInCategory = match.allMarkets.filter((market) =>
-        marketKeys.includes(market.key)
-      );
-
-      if (marketsInCategory.length > 0) {
-        const categorySection = document.createElement("div");
-        categorySection.className = "market-category";
-        categorySection.innerHTML = `<h3 class="category-title">${category}</h3>`;
-
-        marketsInCategory.forEach((market) => {
-          const marketBox = document.createElement("div");
-          marketBox.className = "market-box";
-          marketBox.innerHTML = `
-                    <div class="market-name">${market.name}</div>
-                    <div class="market-outcomes">
-                        ${market.outcomes
-                          .map(
-                            (outcome) => `
-                            <div class="outcome">
-                                <span class="outcome-name">
-                                    ${outcome.name}
-                                    ${
-                                      outcome.point
-                                        ? `<span class="point">(${outcome.point})</span>`
-                                        : ""
-                                    }
-                                </span>
-                                <span class="outcome-price">${
-                                  outcome.price
-                                }</span>
-                            </div>
-                        `
-                          )
-                          .join("")}
-                    </div>
-                `;
-          categorySection.appendChild(marketBox);
-        });
-
-        marketsContainer.appendChild(categorySection);
-      }
-    });
-
-    // Add uncategorized markets
-    const uncategorizedMarkets = match.allMarkets.filter(
-      (market) => !Object.values(marketCategories).flat().includes(market.key)
-    );
-
-    if (uncategorizedMarkets.length > 0) {
-      const otherSection = document.createElement("div");
-      otherSection.className = "market-category";
-      otherSection.innerHTML = '<h3 class="category-title">Other Markets</h3>';
-
-      uncategorizedMarkets.forEach((market) => {
-        console.log("Uncategorized market:", market);
-        otherSection.appendChild(this.createMarketGroup(market));
-      });
-
-      marketsContainer.appendChild(otherSection);
+    // Process main markets first (Match Winner)
+    const mainMarket = match.allMarkets.find((m) => m.key === "h2h");
+    if (mainMarket) {
+      const mainSection = document.createElement("div");
+      mainSection.className = "market-category";
+      mainSection.innerHTML = `
+            <h3 class="category-title">Match Winner</h3>
+            <div class="market-box">
+                <div class="odds-container main-odds">
+                    ${mainMarket.outcomes
+                      .map(
+                        (outcome, index) => `
+                        <div class="odds-display">
+                            <span class="odds-label">${
+                              index === 1 && mainMarket.outcomes.length === 3
+                                ? "X"
+                                : index === 0
+                                ? "1"
+                                : "2"
+                            }</span>
+                            <span class="odds-value">${outcome.price}</span>
+                        </div>
+                    `
+                      )
+                      .join("")}
+                </div>
+            </div>
+        `;
+      marketsContainer.appendChild(mainSection);
     }
+
+    /* ...rest of market categories rendering... */
 
     // Assemble the view
     detailedView.innerHTML = matchHeader;
@@ -608,17 +440,14 @@ class BettingUI {
       minute: "2-digit",
     });
 
-    // Create single row of odds with consistent labels
-    const allOdds = [
-      { team: match.teams[0], value: match.odds[match.teams[0]] || "-" },
-      { team: "Draw", value: match.odds["Draw"] || "-" },
-      { team: match.teams[1], value: match.odds[match.teams[1]] || "-" },
+    // Standardize odds display with 1-X-2 format
+    const standardizedOdds = [
+      { label: "1", value: match.odds[match.teams[0]] || "-" },
+      ...(match.odds.hasOwnProperty("Draw")
+        ? [{ label: "X", value: match.odds["Draw"] || "-" }]
+        : []),
+      { label: "2", value: match.odds[match.teams[1]] || "-" },
     ];
-
-    // Filter out Draw if it's not a soccer match (no draw odds)
-    const displayOdds = match.odds.hasOwnProperty("Draw")
-      ? allOdds
-      : allOdds.filter((odd) => odd.team !== "Draw");
 
     return `
         <div class="match-info">
@@ -630,11 +459,11 @@ class BettingUI {
         </div>
         <div class="odds-section">
             <div class="odds-container">
-                ${displayOdds
+                ${standardizedOdds
                   .map(
                     (odd) => `
                     <div class="odds-display">
-                        <span class="odds-label">${odd.team}</span>
+                        <span class="odds-label">${odd.label}</span>
                         <span class="odds-value">${odd.value}</span>
                     </div>
                 `

@@ -1,59 +1,29 @@
+/* Base Page Structure */
 body {
-  margin: 0;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #1a2b3c, #2c5364, #2c4c3b);
-  font-family: "Segoe UI", Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  margin: 0; /* Removes default spacing around page edge */
+  min-height: 100vh; /* Makes body fill at least full viewport height */
+  background: linear-gradient(
+    135deg,
+    #1a2b3c,
+    #2c5364,
+    #2c4c3b
+  ); /* Diagonal gradient from dark blue to green */
+  font-family: "Segoe UI", Arial, sans-serif; /* Modern font with fallbacks */
+  display: flex; /* Enables flexbox layout */
+  flex-direction: column; /* Stack children top to bottom */
+  align-items: center; /* Center content horizontally */
 }
 
+/* Page Header */
 h1 {
-  color: white;
-  text-align: center;
-  padding: 1rem;
-  margin: 0;
-  width: 100%;
+  color: white; /* White text color */
+  text-align: center; /* Centers the text */
+  padding: 1rem; /* Space around the text */
+  margin: 0; /* Removes default margin */
+  width: 100%; /* Full width */
 }
 
-#content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  background: rgba(241, 245, 249, 0.95);
-  border-radius: 15px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-#sports-nav {
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-.sport-tab {
-  display: inline-block;
-  padding: 12px 25px;
-  margin: 5px;
-  background: #34775c73;
-  color: white;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  font-size: 0.9em;
-  letter-spacing: 1px;
-}
-
-.sport-tab:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.sport-tab.active {
-  background: #448362f1;
-  box-shadow: 0 4px 10px rgba(30, 58, 49, 0.3);
-}
-
+/* Main Match Card Styles */
 .match-card {
   background: rgba(255, 255, 255, 0.98);
   border-radius: 10px;
@@ -72,28 +42,35 @@ h1 {
 }
 
 .match-card:hover {
-  transform: translateY(-1px);
+  transform: translateY(-1px); /* Slight lift on hover */
 }
 
-.match-card.expanded {
-  margin: 1rem 0;
-  background: rgba(255, 255, 255, 1);
+/* Match Information Section */
+.match-info {
+  width: 250px; /* Fixed width */
+  flex-shrink: 0; /* Prevent shrinking */
+  padding-right: 2rem; /* Space before odds */
+  border-right: 2px solid rgba(52, 119, 92, 0.1); /* Separator line */
 }
 
-.match-card.detailed-view {
-  width: 100%;
-  margin: 1rem 0;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.teams-container {
+  display: grid; /* Grid layout */
+  grid-template-columns: 1fr; /* Single column */
+  gap: 0.25rem; /* Space between teams */
+  margin-bottom: 0.5rem; /* Space before time */
 }
 
-.detailed-view .match-info {
-  flex: 0 0 300px;
+.team {
+  font-size: 0.95em; /* Slightly smaller than normal */
+  font-weight: 500; /* Medium weight text */
+  color: #1e3a31; /* Dark green text */
+  padding: 0.25rem 0; /* Vertical space only */
 }
 
-.detailed-view .team {
-  font-size: 1.1em;
-  padding: 0.5rem 0;
+.match-time {
+  font-size: 0.8em; /* Small text */
+  color: #34775c; /* Green text */
+  margin-top: 0.5rem; /* Space above time */
 }
 
 .extra-markets {
@@ -164,43 +141,231 @@ h1 {
   font-size: 1.1em;
 }
 
-.match-info {
-  width: 250px;
-  flex-shrink: 0;
-  padding-right: 2rem;
-  border-right: 2px solid rgba(52, 119, 92, 0.1);
+/* Odds Display Section */
+.odds-section {
+  width: 300px; /* Controls overall width of odds section */
+  flex-shrink: 0; /* Prevents odds section from getting squeezed */
+  display: flex; /* Uses flexbox for layout */
+  align-items: center; /* Centers odds vertically */
+  margin-left: auto; /* Pushes odds to the right side */
+  padding: 0 1rem; /* Space on left and right */
 }
 
-.teams-container {
+/* Container for the 1-X-2 odds boxes */
+.odds-container {
+  display: flex; /* Horizontal row of odds */
+  justify-content: center; /* Centers the odds boxes */
+  gap: 1.5rem; /* Space between each odds box */
+  padding: 0.5rem; /* Space around all odds boxes */
+}
+
+/* Individual Odds Box (1, X, or 2) */
+.odds-display {
+  display: flex; /* Stacks label and value */
+  flex-direction: column; /* Puts value below label */
+  align-items: center; /* Centers content horizontally */
+  min-width: 60px; /* Minimum width of each box */
+  padding: 0.75rem; /* Space inside the box */
+  background: rgba(52, 119, 92, 0.05); /* Very light green background */
+  border-radius: 6px; /* Rounded corners */
+  transition: all 0.2s ease; /* Smooth hover effect */
+}
+
+/* Label (1, X, 2) inside odds box */
+.odds-label {
+  font-size: 0.9em; /* Slightly smaller text */
+  color: #666; /* Gray text color */
+  margin-bottom: 0.25rem; /* Space below label */
+}
+
+/* The actual odds value */
+.odds-value {
+  font-size: 1.2em; /* Larger than label */
+  font-weight: 600; /* Makes number bold */
+  color: #34775c; /* Green text color */
+}
+
+/* Hover effect for odds boxes */
+.odds-display:hover {
+  background: rgba(52, 119, 92, 0.1); /* Slightly darker on hover */
+  cursor: pointer; /* Shows clickable cursor */
+}
+
+/* Detailed View Odds Styling */
+.main-odds {
+  margin-top: 1rem; /* Space above odds section */
+}
+
+/* Responsive adjustments for odds */
+@media (max-width: 900px) {
+  .odds-section {
+    width: 260px; /* Smaller width on mobile */
+  }
+
+  .odds-display {
+    padding: 0.4rem; /* Less padding on mobile */
+  }
+
+  .odds-value {
+    font-size: 0.95em; /* Smaller text on mobile */
+  }
+}
+
+.extra-markets {
+  display: none;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid rgba(52, 119, 92, 0.1);
+}
+
+.match-card.expanded .extra-markets {
+  display: block;
+}
+
+.market-groups {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(52, 119, 92, 0.05);
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.market-group {
+  margin-bottom: 1rem;
+  background: rgba(255, 255, 255, 0.5);
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.market-title {
+  color: #34775c;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(52, 119, 92, 0.1);
+  font-size: 0.9em;
+}
+
+.market-odds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.market-odd {
+  background: rgba(52, 119, 92, 0.05);
+  padding: 0.75rem;
+  border-radius: 6px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.market-odd:hover {
+  background: rgba(52, 119, 92, 0.1);
+}
+
+.market-odd-name {
+  font-size: 0.8em;
+  color: #1e3a31;
   margin-bottom: 0.5rem;
 }
 
-.team {
-  font-size: 0.95em;
-  font-weight: 500;
-  color: #1e3a31;
-  padding: 0.25rem 0;
-}
-
-.match-time {
-  font-size: 0.8em;
+.market-odd-value {
+  font-weight: 600;
   color: #34775c;
-  margin-top: 0.5rem;
+  font-size: 1.1em;
 }
 
+/* Odds Display Section */
 .odds-section {
-  width: 300px;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-left: auto; /* Push to the right */
-  display: flex;
-  align-items: center;
-  padding: 0 1rem;
+  width: 300px; /* Fixed width for odds section */
+  flex-shrink: 0; /* Prevents section from shrinking */
+  display: flex; /* Uses flexbox layout */
+  align-items: center; /* Centers odds vertically */
+  margin-left: auto; /* Pushes odds to right side */
+  padding: 0 1rem; /* Horizontal space around odds */
+}
+
+/* Container for Odds Cards */
+.odds-container {
+  display: flex; /* Horizontal layout for odds cards */
+  justify-content: center; /* Centers odds horizontally */
+  gap: 1.5rem; /* Space between odds cards */
+  padding: 0.5rem; /* Padding around all odds */
+}
+
+/* Individual Odds Card */
+.odds-display {
+  display: flex; /* Vertical layout inside card */
+  flex-direction: column; /* Stacks label and value */
+  align-items: center; /* Centers content horizontally */
+  min-width: 60px; /* Minimum width of odds card */
+  padding: 0.75rem; /* Inner spacing */
+  background: rgba(52, 119, 92, 0.05); /* Light green background */
+  border-radius: 6px; /* Rounded corners */
+  transition: all 0.2s ease; /* Smooth hover animation */
+}
+
+/* Odds Card Hover Effect */
+.odds-display:hover {
+  background: rgba(52, 119, 92, 0.1); /* Darker background on hover */
+  cursor: pointer; /* Shows clickable cursor */
+}
+
+/* Odds Label (1, X, 2) */
+.odds-label {
+  font-size: 0.9em; /* Label text size */
+  color: #666; /* Gray label color */
+  margin-bottom: 0.25rem; /* Space below label */
+}
+
+/* Odds Value (the number) */
+.odds-value {
+  font-size: 1.2em; /* Larger size for odds value */
+  font-weight: 600; /* Bold odds value */
+  color: #34775c; /* Green odds value color */
+}
+
+/* Detailed View Odds Styling */
+.main-odds {
+  margin-top: 1rem; /* Space above main odds section */
+}
+
+/* Market Box in Detailed View */
+.market-box {
+  background: white; /* White background */
+  padding: 1rem; /* Space inside market box */
+  border-radius: 8px; /* Rounded corners */
+  margin: 1rem 0; /* Vertical spacing */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+}
+
+/* Responsive Design for Odds */
+@media (max-width: 900px) {
+  .odds-section {
+    width: 260px; /* Smaller width on mobile */
+  }
+
+  .odds-display {
+    padding: 0.4rem; /* Less padding on mobile */
+  }
+
+  .odds-value {
+    font-size: 0.95em; /* Smaller text on mobile */
+  }
+}
+
+/* Odds Display Section */
+.odds-section {
+  width: 300px; /* Fixed width */
+  flex-shrink: 0; /* Prevents shrinking */
+  display: flex; /* Flex layout */
+  align-items: center; /* Vertical centering */
+  margin-left: auto; /* Pushes to right */
+  padding: 0 1rem; /* Horizontal padding */
 }
 
 .odds-header {
@@ -214,30 +379,17 @@ h1 {
 }
 
 .odds-label {
-  font-size: 0.8em;
-  color: #34775c;
-  font-weight: 600;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  font-size: 0.8em;
-  color: #666;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100px;
-  text-align: center;
+  font-size: 0.9em; /* Slightly smaller than normal text */
+  color: #666; /* Medium gray color */
+  margin-bottom: 0.25rem; /* Space below the label */
 }
 
+/* Odds Display Section */
 .odds-container {
-  display: grid;
-  grid-template-columns: repeat(3, 80px);
-  gap: 0.75rem;
-  width: 100%;
-  justify-content: center;
-  display: flex;
-  gap: 1rem;
-  align-items: center;
+  display: flex; /* Horizontal layout */
+  justify-content: center; /* Centers content */
+  gap: 1.5rem; /* Space between odds */
+  padding: 0.5rem; /* Inner spacing */
 }
 
 .odds-button {
@@ -262,30 +414,26 @@ h1 {
   transform: none;
 }
 
+/* Odds Display Component */
 .odds-display {
-  background: rgba(52, 119, 92, 0.05);
-  padding: 0.6rem;
-  border-radius: 6px;
-  text-align: center;
-  width: 80px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  min-width: 100px;
-  padding: 0.5rem;
-  background: rgba(52, 119, 92, 0.05);
-  border-radius: 6px;
+  display: flex; /* Stack content vertically */
+  flex-direction: column; /* Top to bottom layout */
+  align-items: center; /* Center horizontally */
+  min-width: 60px; /* Minimum width to prevent squishing */
+  padding: 0.75rem; /* Space inside the odds box */
+  background: rgba(52, 119, 92, 0.05); /* Very light green background */
+  border-radius: 6px; /* Slightly rounded corners */
+  transition: all 0.2s ease; /* Smooth hover effect */
+}
+
+.odds-display:hover {
+  background: rgba(52, 119, 92, 0.1);
 }
 
 .odds-value {
-  color: #1e3a31;
-  font-weight: 600;
-  font-size: 1.1em;
-  font-size: 1.1em;
-  font-weight: 600;
-  color: #34775c;
+  font-size: 1.2em; /* Larger than normal text */
+  font-weight: 600; /* Semi-bold text */
+  color: #34775c; /* Green text color */
 }
 
 .sports-nav-container {
@@ -940,6 +1088,104 @@ h1 {
   color: #666;
   margin-left: 0.5rem;
   font-size: 0.9em;
+}
+
+/* ...rest of existing styles... */
+
+/* ...existing styles... */
+
+.odds-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: rgba(52, 119, 92, 0.05);
+  border-radius: 8px;
+}
+
+.team-names {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.team-name {
+  color: #1e3a31;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.odds-values {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.market-box {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.odds-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-width: 80px;
+  padding: 0.5rem;
+  background: rgba(52, 119, 92, 0.05);
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.odds-display:hover {
+  background: rgba(52, 119, 92, 0.1);
+  cursor: pointer;
+}
+
+/* ...rest of existing styles... */
+
+/* ...existing styles... */
+
+.odds-container {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.5rem;
+}
+
+.odds-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+  padding: 0.75rem;
+  background: rgba(52, 119, 92, 0.05);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.odds-display:hover {
+  background: rgba(52, 119, 92, 0.1);
+  cursor: pointer;
+}
+
+.odds-label {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.odds-value {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #34775c;
+}
+
+.main-odds {
+  margin-top: 1rem;
 }
 
 /* ...rest of existing styles... */
