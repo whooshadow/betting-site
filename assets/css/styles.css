@@ -45,18 +45,17 @@ h1 {
   transform: translateY(-1px); /* Slight lift on hover */
 }
 
-/* Match Information Section */
+/* Team names info to to the separation bar */
 .match-info {
   width: 250px; /* Fixed width */
   flex-shrink: 0; /* Prevent shrinking */
-  padding-right: 2rem; /* Space before odds */
   border-right: 2px solid rgba(52, 119, 92, 0.1); /* Separator line */
 }
 
 .teams-container {
   display: grid; /* Grid layout */
   grid-template-columns: 1fr; /* Single column */
-  gap: 0.25rem; /* Space between teams */
+  gap: 0.5rem; /* Space between teams */
   margin-bottom: 0.5rem; /* Space before time */
 }
 
@@ -87,7 +86,7 @@ h1 {
 .market-groups {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
+  gap: 4rem;
   padding: 1rem;
   background: rgba(52, 119, 92, 0.05);
   border-radius: 8px;
@@ -327,11 +326,6 @@ h1 {
   font-size: 1.2em; /* Larger size for odds value */
   font-weight: 600; /* Bold odds value */
   color: #34775c; /* Green odds value color */
-}
-
-/* Detailed View Odds Styling */
-.main-odds {
-  margin-top: 1rem; /* Space above main odds section */
 }
 
 /* Market Box in Detailed View */
@@ -865,9 +859,10 @@ h1 {
   color: #34775c;
   font-size: 1.2em;
   font-weight: 600;
-  margin: 1rem 0;
+  margin: 0.5rem 0;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid rgba(52, 119, 92, 0.1);
+  text-align: center;
 }
 
 .market-groups {
@@ -906,32 +901,21 @@ h1 {
 /* ...rest of existing styles... */
 
 .detailed-match-view {
-  padding: 1rem;
+  padding: 1rem; /* Keep compact padding */
   background: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   position: relative;
-  padding: 2rem 1rem;
 }
 
 .back-button {
-  background: #34775c;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-bottom: 1rem;
-  font-weight: 500;
   position: absolute;
-  left: 1.5rem;
-  top: 1.5rem;
+  left: 1rem; /* Align to left edge */
+  top: 1rem; /* Align to top edge */
   background: none;
   border: none;
   color: #34775c;
   font-size: 1.8rem;
-  cursor: pointer;
-  padding: 0.5rem;
   width: 40px;
   height: 40px;
   display: flex;
@@ -939,125 +923,53 @@ h1 {
   justify-content: center;
   border-radius: 50%;
   transition: background-color 0.2s;
-}
-
-.back-button:hover {
-  background: rgba(52, 119, 92, 0.1);
+  cursor: pointer;
 }
 
 .match-header {
+  padding: 1rem 3rem; /* Add padding to account for back button */
   text-align: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(52, 119, 92, 0.2);
-  padding-top: 0.5rem;
+  border-bottom: 1px solid rgba(52, 119, 92, 0.1);
+  margin: 0.4rem auto 0rem auto;
 }
 
 .match-header h2 {
-  font-size: 1.8rem;
-  margin: 0.5rem 0;
+  font-size: 1.4rem;
+  margin: 0;
   color: #1e3a31;
 }
 
 .betting-markets {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
-}
-
-.market-group {
-  background: rgba(255, 255, 255, 0.5);
-  padding: 1rem;
-  border-radius: 8px;
-}
-
-.market-group-title {
-  color: #34775c;
-  margin-bottom: 1rem;
-  font-size: 1.1em;
-}
-
-.markets-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-.market-box {
-  background: white;
-  padding: 1rem;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.market-name {
-  color: #34775c;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(52, 119, 92, 0.1);
-}
-
-.market-outcomes {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.outcome {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  gap: 1rem; /* Reduced gap */
   padding: 0.5rem;
-  background: rgba(52, 119, 92, 0.05);
-  border-radius: 4px;
-}
-
-.outcome:hover {
-  background: rgba(52, 119, 92, 0.1);
-}
-
-.outcome-name {
-  font-weight: 500;
-}
-
-.outcome-point {
-  color: #666;
-  font-size: 0.9em;
-}
-
-.outcome-price {
-  color: #34775c;
-  font-weight: 600;
 }
 
 /* ...rest of existing styles... */
 
-/* ...existing styles... */
-
 .detailed-match-view {
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 1.5rem;
+  border-radius: 12px; /* Rounded corners */
+  padding: 0rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .betting-markets {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .market-category {
-  background: rgba(255, 255, 255, 0.5);
-  padding: 1rem;
+  background: rgb(230, 233, 229);
+  padding: 0 1rem 0.1rem 1rem; /* top right bottom left */
   border-radius: 8px;
 }
 
 .market-box {
   background: white;
-  padding: 1rem;
-  margin: 1rem 0;
+  margin: 0.7rem 0;
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -1185,7 +1097,7 @@ h1 {
 }
 
 .main-odds {
-  margin-top: 1rem;
+  margin-top: 0rem;
 }
 
 /* ...rest of existing styles... */
